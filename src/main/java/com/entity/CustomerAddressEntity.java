@@ -1,0 +1,27 @@
+package com.entity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "customer_address")
+public class CustomerAddressEntity {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Integer addressId;
+	String title;
+	String addressLine;
+	Integer pincode;
+	Float lat;
+	Float log;
+	
+	@ManyToOne
+	@JoinColumn(name="customerId")
+	CustomerEntity customer;
+}
