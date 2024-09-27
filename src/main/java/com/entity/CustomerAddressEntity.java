@@ -7,10 +7,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
 @Entity
 @Table(name = "customer_address")
-public class CustomerAddressEntity {
+@Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class CustomerAddressEntity 
+{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,5 +29,6 @@ public class CustomerAddressEntity {
 	
 	@ManyToOne
 	@JoinColumn(name="customerId")
-	CustomerEntity customer;
+	CustomerEntity customer;	
+	
 }

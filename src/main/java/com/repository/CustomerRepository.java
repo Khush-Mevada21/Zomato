@@ -7,3 +7,4 @@ import com.entity.CustomerEntity;
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Integer> {
 
 }
+

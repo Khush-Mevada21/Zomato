@@ -13,7 +13,7 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 @Entity
-@Table(name = "customer")
+@Table(name = "customers")
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomerEntity 
