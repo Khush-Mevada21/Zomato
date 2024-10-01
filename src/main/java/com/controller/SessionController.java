@@ -1,5 +1,6 @@
 package com.controller;
 
+import java.lang.StackWalker.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,6 +54,23 @@ public class SessionController {
 	{
 		customerAddressRepository.save(customerAddressEntity);
 		return customerAddressEntity;
+	}
+	
+	// get address by customerId
+	
+	@GetMapping("/myaddress/{customerId}")
+	public String getAddressById(@PathVariable("customerId") Integer customerId)
+	{
+		Optional<CustomerAddressEntity> op = customerAddressRepository.findByCustomer_CustomerId(customerId);
+		if(op.isEmpty())
+		{
+			return "customerId Not Found";
+		}
+		else
+		{
+			CustomerAddressEntity customerAddressEntity = op.get();
+			return customerAddressEntity.getAddressLine();
+		}
 	}
 	
 	// Restaurant
