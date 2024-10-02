@@ -1,6 +1,5 @@
 package com.controller;
 
-import java.lang.StackWalker.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,10 +8,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.entity.CustomerAddressEntity;
 import com.entity.CustomerEntity;
+import com.entity.LoginEntity;
 import com.entity.RestaurantEntity;
 import com.repository.CustomerRepository;
 import com.repository.RestaurantRepository;
@@ -85,15 +86,16 @@ public class SessionController {
 	@GetMapping("/getrestaurant")
 	public List<RestaurantEntity> getAllRestaurants()
 	{
-		List<RestaurantEntity> restaurant = restaurantRepository.findAll();
+		//List<RestaurantEntity> restaurant = restaurantRepository.findAll(); --for restaurant details
 		
-		return restaurant;
+		return restaurantRepository.findByActive(1);
 	}
+	
 	
 	@GetMapping("/getrestaurant/{pincode}")
 	public RestaurantEntity getRestaurantByPincode(@PathVariable("pincode") Integer pincode)
 	{
-		Optional<RestaurantEntity> op = restaurantRepository.findByPincode(pincode);
+		Optional<RestaurantEntity> op = restaurantRepository.findByPincodeAndActive(pincode,1);
 		if(op.isEmpty())
 		{
 			return null;
@@ -102,8 +104,46 @@ public class SessionController {
 		{
 			RestaurantEntity restaurantEntity = op.get();
 			return restaurantEntity;
+			//return op.get();
 		}
 	}
 	
+	// login with userType - customer or restaurant
+	
+	@PostMapping("/login")
+	public String userLogin(@RequestBody LoginEntity loginEntity)
+	{	
+		String email = loginEntity.getEmail();
+		String password = loginEntity.getPassword();
+		String userType = loginEntity.getUserType();
+		
+		if(userType.equalsIgnoreCase("customer"))
+		{
+			Optional<CustomerEntity> customer = customerRepository.findByEmailAndPassword(email, password);
+			if(customer.isEmpty())
+			{
+				return "Invalid Login Credentials !";
+			}
+			else
+			{
+				return "Customer Login Successful..";
+			}
+		}
+		else if(userType.equalsIgnoreCase("restaurant"))
+		{
+			Optional<RestaurantEntity> restaurant = restaurantRepository.findByEmailAndPassword(email, password);
+			if(restaurant.isEmpty())
+			{
+				return "Invalid Login Credentials !";
+			}
+			else
+			{
+				return "Restaurant Login Successful..";
+			}
+		}
+		else {
+			return "Invalid userType ! ";
+		}
+	}
 	
 }
