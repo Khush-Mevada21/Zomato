@@ -14,4 +14,6 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity, In
 	Optional<RestaurantEntity> findByPincodeAndActive(Integer pincode, Integer active);
 
 	Optional<RestaurantEntity> findByEmailAndPassword(String email, String password);
+	
+	Optional<RestaurantEntity> findByEmail(String email);
 }

@@ -2,21 +2,23 @@ package com.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.entity.CustomerAddressEntity;
 import com.entity.CustomerEntity;
 import com.entity.LoginEntity;
 import com.entity.RestaurantEntity;
+import com.entity.UpdatePasswordEntity;
 import com.repository.CustomerRepository;
 import com.repository.RestaurantRepository;
+import com.service.EmailService;
 import com.repository.CustomerAddressRepository;
 
 @RestController
@@ -30,6 +32,9 @@ public class SessionController {
 	
 	@Autowired
 	RestaurantRepository restaurantRepository;
+	
+	@Autowired
+	EmailService emailService;
 	
 	//Customer
 	
@@ -120,24 +125,20 @@ public class SessionController {
 		if(userType.equalsIgnoreCase("customer"))
 		{
 			Optional<CustomerEntity> customer = customerRepository.findByEmailAndPassword(email, password);
-			if(customer.isEmpty())
-			{
+			if(customer.isEmpty()){
 				return "Invalid Login Credentials !";
 			}
-			else
-			{
+			else{
 				return "Customer Login Successful..";
 			}
 		}
 		else if(userType.equalsIgnoreCase("restaurant"))
 		{
 			Optional<RestaurantEntity> restaurant = restaurantRepository.findByEmailAndPassword(email, password);
-			if(restaurant.isEmpty())
-			{
+			if(restaurant.isEmpty()){
 				return "Invalid Login Credentials !";
 			}
-			else
-			{
+			else{
 				return "Restaurant Login Successful..";
 			}
 		}
@@ -146,4 +147,90 @@ public class SessionController {
 		}
 	}
 	
+
+	// forget password 
+	@PostMapping("/forgetpassword")
+	public String forgetPassword(@RequestBody LoginEntity loginEntity)
+	{
+		String email = loginEntity.getEmail();
+		String userType = loginEntity.getUserType();
+		
+		if(userType.equalsIgnoreCase("customer")) 
+		{
+			Optional<CustomerEntity> customer = customerRepository.findByEmail(email);
+			if(customer.isEmpty()) {
+				return "Customer Email Not Found";
+			}
+			else {
+				String otp = generateOtp();
+				
+				sendOtpEmail(email, otp);
+				
+				return "OTP Send to customer email..";
+			}
+		}
+		else if(userType.equalsIgnoreCase("restaurant")) 
+		{
+			Optional<RestaurantEntity> customer = restaurantRepository.findByEmail(email);
+			if(customer.isEmpty()) {
+				return "Restaurant Email Not Found";
+			}
+			else {
+				String otp = generateOtp();
+				
+				sendOtpEmail(email, otp);
+				
+				return "OTP Send to restaurant email..";
+			}
+		}
+		else {
+			return "Inavlid userType !";
+		}
+	}
+	
+	
+	// OTP Generation
+	private String generateOtp()
+	{
+		Random random = new Random();
+		int otp = 1000 + random.nextInt(9000);
+		System.out.println("Generated OTP -- Your OTP is :"+otp);
+		return String.valueOf(otp);
+	}
+
+    private void sendOtpEmail(String email, String otp) 
+    {
+    	emailService.sendOTPMail(email, "Your OTP is : "+otp);
+    	System.out.println("Sent OTP -- Your OTP 2 is :"+otp);
+    }
+	
+    
+    // Update Password
+    @PostMapping("/updatepassword")
+    public String updatePassword(@RequestBody UpdatePasswordEntity updatePasswordEntity)
+    {
+    	String email = updatePasswordEntity.getEmail();
+    	String newpassword = updatePasswordEntity.getNewpassword();
+    	String cpassword = updatePasswordEntity.getCpassword();
+    	Integer otp = updatePasswordEntity.getOtp();
+    	
+    	Optional<CustomerEntity> customer = customerRepository.findByEmail(email);
+    	if(customer.isEmpty()) 
+    	{
+    		return "Customer Email Not Found !";
+    	}
+    	else if(newpassword.equals(cpassword)) 
+    	{
+    		CustomerEntity customerEntity = customer.get();
+    		
+    		customerEntity.setPassword(newpassword);
+    		customerRepository.save(customerEntity);
+    		return "Password Updated Succesfully..";
+    	}
+    	else
+    	{
+    		return "Password doesn't match !";
+    	}
+    }
+		
 }
