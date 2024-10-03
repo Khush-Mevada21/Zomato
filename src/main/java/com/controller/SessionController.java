@@ -113,6 +113,18 @@ public class SessionController {
 		}
 	}
 	
+	@GetMapping("/getrestaurantbyId/{restaurantId}")
+	public RestaurantEntity getRestaurantById(@PathVariable("restaurantId") Integer restaurantId)
+	{
+		Optional<RestaurantEntity> op = restaurantRepository.findById(restaurantId);
+		if(op.isEmpty()){
+			return null;
+		}
+		else{
+			return op.get();
+		}
+	}
+	
 	// login with userType - customer or restaurant
 	
 	@PostMapping("/login")
