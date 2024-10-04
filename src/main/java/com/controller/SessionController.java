@@ -5,18 +5,22 @@ import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.entity.CustomerAddressEntity;
 import com.entity.CustomerEntity;
 import com.entity.LoginEntity;
+import com.entity.MenuEntity;
 import com.entity.RestaurantEntity;
 import com.entity.UpdatePasswordEntity;
 import com.repository.CustomerRepository;
+import com.repository.MenuRepository;
 import com.repository.RestaurantRepository;
 import com.service.EmailService;
 import com.repository.CustomerAddressRepository;
@@ -35,6 +39,9 @@ public class SessionController {
 	
 	@Autowired
 	EmailService emailService;
+	
+	@Autowired
+	MenuRepository menuRepository;
 	
 	//Customer
 	
@@ -218,7 +225,7 @@ public class SessionController {
 	
     
     // Update Password
-    @PostMapping("/updatepassword")
+    @PutMapping("/updatepassword")
     public String updatePassword(@RequestBody UpdatePasswordEntity updatePasswordEntity)
     {
     	String email = updatePasswordEntity.getEmail();
@@ -245,4 +252,29 @@ public class SessionController {
     	}
     }
 		
+    
+    // Menu CRUD Operations
+    
+    @PostMapping("/addmenu")
+    public MenuEntity addMenu(@RequestBody MenuEntity menuEntity)
+    {
+    	menuRepository.save(menuEntity);
+    	return menuEntity;
+    }
+    
+    @PutMapping("/updatemenu")
+    public String updateMenu(@RequestBody MenuEntity menuEntity)
+    {
+    	menuRepository.save(menuEntity);
+    	return "Menu Updated Successfully..";
+    }
+    
+    @DeleteMapping("/deletemenu")
+    public String deleteMenu(@RequestBody MenuEntity menuEntity)
+    {
+    	menuRepository.delete(menuEntity);
+    	return "Menu Deleted SuccessFully..";
+ 
+    }
+    
 }
