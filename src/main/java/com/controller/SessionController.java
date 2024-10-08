@@ -181,9 +181,7 @@ public class SessionController {
 				return "Customer Email Not Found";
 			}
 			else {
-				String otp = generateOtp();
-				
-				sendOtpEmail(email, otp);
+				emailService.sendOTPMail(email);
 				
 				return "OTP Send to customer email..";
 			}
@@ -195,9 +193,7 @@ public class SessionController {
 				return "Restaurant Email Not Found";
 			}
 			else {
-				String otp = generateOtp();
-				
-				sendOtpEmail(email, otp);
+				emailService.sendOTPMail(email);
 				
 				return "OTP Send to restaurant email..";
 			}
@@ -208,21 +204,6 @@ public class SessionController {
 	}
 	
 	
-	// OTP Generation
-	private String generateOtp()
-	{
-		Random random = new Random();
-		int otp = 1000 + random.nextInt(9000);
-		System.out.println("Generated OTP -- Your OTP is :"+otp);
-		return String.valueOf(otp);
-	}
-
-    private void sendOtpEmail(String email, String otp) 
-    {
-    	emailService.sendOTPMail(email, "Your OTP is : "+otp);
-    	System.out.println("Sent OTP -- Your OTP 2 is :"+otp);
-    }
-	
     
     // Update Password
     @PutMapping("/updatepassword")
@@ -231,19 +212,35 @@ public class SessionController {
     	String email = updatePasswordEntity.getEmail();
     	String newpassword = updatePasswordEntity.getNewpassword();
     	String cpassword = updatePasswordEntity.getCpassword();
-    	Integer otp = updatePasswordEntity.getOtp();
+    	String otp = updatePasswordEntity.getOtp();
     	
     	Optional<CustomerEntity> customer = customerRepository.findByEmail(email);
+    	
+    
+    	System.out.println("Validating OTP for email: " + email + " with OTP: " + otp);
+    	if (!emailService.validateOTP(email, otp)) 
+    	{
+            System.out.println("Invalid OTP for " + email);
+            return "Invalid OTP!";
+        }
+    	
+    	
     	if(customer.isEmpty()) 
     	{
     		return "Customer Email Not Found !";
     	}
-    	else if(newpassword.equals(cpassword)) 
+    	
+    	if(newpassword.equals(cpassword)) 
     	{
     		CustomerEntity customerEntity = customer.get();
     		
     		customerEntity.setPassword(newpassword);
+    		
+    		customerEntity.setOtp(otp);
+            System.out.println("updatd otp :"+otp);
+            
     		customerRepository.save(customerEntity);
+    		
     		return "Password Updated Succesfully..";
     	}
     	else

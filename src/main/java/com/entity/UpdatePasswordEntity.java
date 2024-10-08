@@ -11,6 +11,6 @@ public class UpdatePasswordEntity {
 	String email;
 	String newpassword;
 	String cpassword;
-	Integer otp;
+	String otp;
 	
 }
