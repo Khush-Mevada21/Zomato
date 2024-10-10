@@ -325,4 +325,32 @@ public class SessionController {
     }
     
     
+    // menu by restaurant Id
+    
+    @GetMapping("/getmenubyrestaurantId/{restaurantId}")
+    public MenuEntity getmenuByRestaurantId(@PathVariable("restaurantId") Integer restaurantId)
+    {
+    	Optional<MenuEntity> op = menuRepository.findById(restaurantId);
+    	if(op.isEmpty()) {
+    		return null;
+    	}
+    	else {
+    		return op.get();
+    	}
+    }
+    
+    
+    // items by menu Id 
+    @GetMapping("/getitembymenuId/{menuId}")
+    public ItemEntity getitemByMenuId(@PathVariable("menuId") Integer menuId)
+    {
+    	Optional<ItemEntity> op = itemRepository.findById(menuId);
+    	if(op.isEmpty()) {
+    		return null;
+    	}
+    	else {
+    		return op.get();
+    	}
+    }
+    
 }
