@@ -15,11 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.entity.CustomerAddressEntity;
 import com.entity.CustomerEntity;
+import com.entity.ItemEntity;
 import com.entity.LoginEntity;
 import com.entity.MenuEntity;
 import com.entity.RestaurantEntity;
 import com.entity.UpdatePasswordEntity;
 import com.repository.CustomerRepository;
+import com.repository.ItemRepository;
 import com.repository.MenuRepository;
 import com.repository.RestaurantRepository;
 import com.service.EmailService;
@@ -42,6 +44,9 @@ public class SessionController {
 	
 	@Autowired
 	MenuRepository menuRepository;
+	
+	@Autowired
+	ItemRepository itemRepository;
 	
 	//Customer
 	
@@ -271,7 +276,53 @@ public class SessionController {
     {
     	menuRepository.delete(menuEntity);
     	return "Menu Deleted SuccessFully..";
- 
+    	
     }
+    @GetMapping("/getmenu")
+    public List<MenuEntity> getAllMenu()
+    {
+    	List<MenuEntity> menu = menuRepository.findAll();
+    	return menu;
+    }
+      
+    
+    // Item CRUD
+    
+    @PostMapping("/additem")
+    public ItemEntity addItem(@RequestBody ItemEntity itemEntity)
+    {
+    	itemRepository.save(itemEntity);
+    	return itemEntity;
+    }
+    
+    @PutMapping("/updateitem")
+    public String updateItem(@RequestBody ItemEntity itemEntity)
+    {
+    	if(itemEntity.getItemId() != null && itemRepository.existsById(itemEntity.getItemId()))
+    	{
+    		itemRepository.save(itemEntity);
+        	return "Item Updated Successfully..";
+    	}
+    	else
+    	{
+    		return "Item Not Found !";
+    	}
+    }
+    
+    @DeleteMapping("/deleteitem")
+    public String deleteItem(@RequestBody ItemEntity itemEntity)
+    {
+    	itemRepository.delete(itemEntity);
+    	return "Item Deleted SuccessFully..";
+    	
+    }
+    
+    @GetMapping("/getitem")
+    public List<ItemEntity> getAllItem()
+    {
+    	List<ItemEntity> item = itemRepository.findAll();
+    	return item;
+    }
+    
     
 }
